@@ -1,20 +1,32 @@
 import { BadRequestError } from "../errors/badRequest.error.js"
+import { ConflictError } from "../errors/conflict.error.js"
 import { createApiKey, verifyToken } from "../middlewares/apiKey.middleware.js"
 import { checkPassword, createHash } from "../middlewares/password.middleware.js"
 import userModel from "../models/user.model.js"
-import { sendVerificationCode } from "./mail.service.js"
+import { sendNewPassword, sendVerificationCode } from "./mail.service.js"
 
 const generateVerificationCode = () => {
     return Math.floor(100000 + Math.random() * 900000).toString()
 }
+const generateRandomString = () => {
+    return Math.random().toString(36).slice(2, 10);
+};
 
 const register = async ({ email, password, retypePassword }) => {
+    const user = await userModel.findOne({email})
+    if(user){
+        throw new ConflictError('Email đã được sử dụng')
+    }
     if (retypePassword !== password) {
         throw new BadRequestError('Mật khẩu không trùng khớp')
     }
     const verificationCode = generateVerificationCode()
-    await sendVerificationCode(email, verificationCode)
-    return createApiKey({ email, password, verificationCode })
+    if(await sendVerificationCode(email, verificationCode)){
+        return createApiKey({ email, password, verificationCode })
+    }
+    else {
+        throw new BadRequestError('Gửi mã xác thực thất bại. Vui lòng thử lại.'); 
+    }
 }
 
 const createUser = async (token, verification) => {
@@ -28,7 +40,7 @@ const createUser = async (token, verification) => {
 
 const login = async ({ username, password }) => {
     const user = await userModel.findOne({
-        $or: [{ email: username }, { phone: username }]
+        $or: [{ email: username }, { phoneNumber: username }]
     }).orFail(() => {
         throw new BadRequestError('Username or password is incorrect')
     })
@@ -39,8 +51,8 @@ const login = async ({ username, password }) => {
     return createApiKey({id: user._id, role: user.role})
 }
 
-const updateUser = async (id, data) => {
-    const user = await userModel.findByIdAndUpdate(id,{...data}, {new: true})
+const updateUser = async (id, {phoneNumber, address, name}) => {
+    const user = await userModel.findByIdAndUpdate(id,{phoneNumber, address, name}, {new: true})
     return user
 }
 
@@ -57,11 +69,19 @@ const changePassword = async(id,{password, newPassword, retypeNewPassword}) => {
     return await userModel.findByIdAndUpdate(id, {password: hashPassword}, {new: true})
 }
 
-
+const forgotPassword = async(email) => {
+    const user = await userModel.findOne({email}).orFail(new BadRequestError('Không tìm thấy tài khoản'))
+    const randomString = generateRandomString();
+    const hashPassword = await createHash(randomString)
+    await user.updateOne({password: hashPassword})
+    return await sendNewPassword(user.email, randomString);
+}
 
 export const userService = {
     register,
     createUser,
     login,
-    changePassword
+    changePassword,
+    forgotPassword,
+    updateUser
 }
