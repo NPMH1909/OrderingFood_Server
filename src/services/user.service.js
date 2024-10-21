@@ -73,7 +73,7 @@ const forgotPassword = async(email) => {
     const user = await userModel.findOne({email}).orFail(new BadRequestError('Không tìm thấy tài khoản'))
     const randomString = generateRandomString();
     const hashPassword = await createHash(randomString)
-    await user.updateOne({password: hashPassword})
+    await user.updateOne({password: hashPassword}).orFail(new BadRequestError('Có lỗi xảy ra'))
     return await sendNewPassword(user.email, randomString);
 }
 

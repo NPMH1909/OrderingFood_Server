@@ -5,12 +5,13 @@ import { BadRequestError } from "../errors/badRequest.error.js"
 import { ForbiddenRequestError } from "../errors/forbiddenRequest.error.js"
 import { UnAuthorizedError } from "../errors/unauthorizedRequest.error.js"
 import { NotFoundError } from "../errors/notFound.error.js"
+import userModel from "../models/user.model.js"
 
 
 export const createApiKey = (data) => {
   const token = jwt.sign(
     {
-      exp: Math.floor(Date.now() / 1000) + 1 * 60,
+      exp: Math.floor(Date.now() / 1000) + 1 * 60*10,
       data
     },
     'secret'
@@ -37,22 +38,23 @@ export const verifyToken = (token, verificationCode) => {
 export const requireApiKey = async (req, res, next) => {
   try {
     if (CommonUtils.checkNullOrUndefined(req.headers.authorization)) {
-      throw new UnAuthorizedError('Bạn cần đăng nhập')
+      throw new UnAuthorizedError('Bạn cần đăng nhập 1')
     }
     const apiKey = req.headers.authorization.split(' ')[1]
 
     jwt.verify(apiKey, 'secret', async (err, decoded) => {
       try {
+        console.log('data', decoded)
         if (err || !decoded) {
-          throw new UnAuthorizedError('Bạn cần đăng nhập')
+          throw new UnAuthorizedError('Bạn cần đăng nhập 2')
         } else {
-          const result = await UserModel.findById(decoded.data)
+          const result = await userModel.findById(decoded.data.id)
           if (CommonUtils.checkNullOrUndefined(result)) {
             throw new NotFoundError('Người dùng không tồn tại')
           }
           req.user = {
-            id: decoded.data,
-            role: result.role
+            id: decoded.data.id,
+            role: decoded.data.role
           }
           next()
         }
@@ -67,14 +69,15 @@ export const requireApiKey = async (req, res, next) => {
 
 export const authenticationAdmin = async (req, res, next) => {
   try {
+
     if (
       CommonUtils.checkNullOrUndefined(req.user) ||
       CommonUtils.checkNullOrUndefined(req.user.role) ||
       CommonUtils.checkNullOrUndefined(req.user.id)
     ) {
-      throw new UnAuthorizedError('Bạn cần đăng nhập')
+      throw new UnAuthorizedError('Bạn cần đăng nhập 3')
     }
-    if (req.user.role !== 'RESTAURANT_OWNER') {
+    if (req.user.role !== 'ADMIN') {
       throw new ForbiddenRequestError('Bạn không có quyền truy cập')
     }
     next()

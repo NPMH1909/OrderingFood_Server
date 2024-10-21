@@ -5,7 +5,7 @@ import cloudinary from '../configs/cloundinary.config.js';
 const storage = new CloudinaryStorage({
   cloudinary,
   params: {
-    folder: 'restaurants',
+    folder: 'orderingfood',
     allowedFormats: ['jpg', 'png', 'jpeg'], 
   },
 });

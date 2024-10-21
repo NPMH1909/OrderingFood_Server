@@ -34,6 +34,7 @@ const sendMail = async ({ to, subject, html }) => {
 };
 
 const sendVerificationCode = async (to, verificationCode) => {
+    console.log('code',verificationCode)
     const subject = 'Verification Code';
     const html = `
         <p>Your verification code is: <strong>${verificationCode}</strong></p>
