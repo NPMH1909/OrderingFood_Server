@@ -8,6 +8,9 @@ const createOrder = async(data) => {
 
 const updateOrderStatus = async(id, status) => {
     const order = await orderModel.findByIdAndUpdate(id,{status}, {new: true})
+    if (!order) {
+        throw new NotFoundError("Có lỗi xảy ra");
+    }
     return order
 }
 
@@ -31,8 +34,7 @@ const getAllOrder = async (page = 1, limit = 10) => {
 
 const getOrderByUserId = async (userId, page = 1, limit = 10) => {
     const skip = (page - 1) * limit;
-    try {
-        const orders = await orderModel.find({ user: userId })
+    const orders = await orderModel.find({ user: userId })
             .sort({ createdAt: -1 }) 
             .skip(skip)
             .limit(limit);
@@ -40,7 +42,7 @@ const getOrderByUserId = async (userId, page = 1, limit = 10) => {
         const totalOrders = await orderModel.countDocuments({ user: userId });
         
         if (orders.length === 0) {
-            throw new Error('Không tìm thấy đơn hàng.');
+            throw new NotFoundError('Không tìm thấy đơn hàng.');
         }
         return {
             orders,
@@ -48,9 +50,6 @@ const getOrderByUserId = async (userId, page = 1, limit = 10) => {
             totalPages: Math.ceil(totalOrders / limit),
             totalOrders,
         };
-    } catch (error) {
-        throw new Error(error.message);
-    }
 };
 
 

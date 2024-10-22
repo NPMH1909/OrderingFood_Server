@@ -4,8 +4,8 @@ import { authenticationAdmin, requireApiKey } from "../middlewares/apiKey.middle
 
 const orderRouter = express.Router()
 orderRouter.post('/create', orderController.createOrder)
-orderRouter.put('/update-status',requireApiKey, authenticationAdmin, orderController.updateOrderStatus)
+orderRouter.put('/update-status:id',requireApiKey, authenticationAdmin, orderController.updateOrderStatus)
 orderRouter.get('/getall', requireApiKey, authenticationAdmin, orderController.getAllOrder)
-orderRouter.get('/get',orderController.getOrderByUserId)
+orderRouter.get('/get/:id',orderController.getOrderByUserId)
 
 export default orderRouter

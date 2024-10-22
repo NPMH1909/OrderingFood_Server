@@ -27,7 +27,7 @@ const getAllOrder = async(req, res) => {
         const page = parseInt(req.query.page) || 1
         const limit = parseInt(req.query.limit) || 10
         const result = await orderService.getAllOrder(page, limit)
-        return new Response(HttpStatusCode.Ok, 'Cập nhật trạng thái thành công', result).responseHandler(res)
+        return new Response(HttpStatusCode.Ok, 'Lấy danh sách đơn hàng thành công', result).responseHandler(res)
     } catch (error) {
         return new Response(error.statusCode || HttpStatusCode.InternalServerError, error.message, null).responseHandler(res)
     }
@@ -39,7 +39,7 @@ const getOrderByUserId = async(req, res) => {
         const page = parseInt(req.query.page) || 1
         const limit = parseInt(req.query.limit) || 10
         const result = await orderService.getOrderByUserId(userid, page, limit)
-        return new Response(HttpStatusCode.Ok, 'Cập nhật trạng thái thành công', result).responseHandler(res)
+        return new Response(HttpStatusCode.Ok, 'Lấy danh sách đơn hàng thành công', result).responseHandler(res)
     } catch (error) {
         return new Response(error.statusCode || HttpStatusCode.InternalServerError, error.message, null).responseHandler(res)
     }

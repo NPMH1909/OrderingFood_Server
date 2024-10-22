@@ -8,10 +8,10 @@ import { NotFoundError } from "../errors/notFound.error.js"
 import userModel from "../models/user.model.js"
 
 
-export const createApiKey = (data) => {
+export const createApiKey = (data, exp) => {
   const token = jwt.sign(
     {
-      exp: Math.floor(Date.now() / 1000) + 1 * 60*10,
+      exp: Math.floor(Date.now() / 1000) + 1 * exp,
       data
     },
     'secret'
