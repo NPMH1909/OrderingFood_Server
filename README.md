@@ -13,7 +13,6 @@ SMTP_HOST =
 GOOGLE_GMAIL=  
 GOOGLE_KEY =  
 
-### #paypal config
-PAYPAL_MODE=  
+### #paypal config 
 PAYPAL_CLIENT_ID=  
 PAYPAL_CLIENT_SECRET=  
