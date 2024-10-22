@@ -8,5 +8,7 @@ menuItemRouter.post('/create', requireApiKey,authenticationAdmin, uploadFiles, m
 menuItemRouter.put('/update/:id', requireApiKey,authenticationAdmin, uploadFiles, menuItemController.updateItem)
 menuItemRouter.get('/getall', menuItemController.getMenu)
 menuItemRouter.get('/getallbycategory', menuItemController.getItemByCategory)
+menuItemRouter.get('/get-item/:id', menuItemController.getItem)
+menuItemRouter.delete('/delete-item/:id', menuItemController.deleleItem)
 
 export default menuItemRouter

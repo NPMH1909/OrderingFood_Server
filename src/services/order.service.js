@@ -52,10 +52,15 @@ const getOrderByUserId = async (userId, page = 1, limit = 10) => {
         };
 };
 
+const getOrder = async(id) => {
+    const order = await orderModel.findById(id).orFail(new NotFoundError('Không tìm thấy đơn hàng'))
+    return order
+}
 
 export const orderService = {
     createOrder,
     updateOrderStatus,
     getAllOrder,
     getOrderByUserId,
+    getOrder
 }

@@ -62,10 +62,29 @@ const updateItem = async (req, res) => {
     }
 };
 
-
+const getItem = async(req, res) => {
+    try{
+        const {id} = req.params
+        const updatedItem = await menuItemService.getItem(id);
+        return new Response(HttpStatusCode.Ok, 'Cập nhật thành công', updatedItem).responseHandler(res);
+    } catch (error) {
+        return new Response(error.statusCode || HttpStatusCode.InternalServerError, error.message, null).responseHandler(res);
+    }
+}
+const deleleItem = async(req, res) => {
+    try{
+        const {id} = req.params
+        const updatedItem = await menuItemService.deleleItem(id);
+        return new Response(HttpStatusCode.Ok, 'Cập nhật thành công', updatedItem).responseHandler(res);
+    } catch (error) {
+        return new Response(error.statusCode || HttpStatusCode.InternalServerError, error.message, null).responseHandler(res);
+    }
+}
 export const menuItemController = {
     createItem,
     getMenu,
     getItemByCategory,
-    updateItem
+    updateItem,
+    getItem,
+    deleleItem
 };

@@ -6,6 +6,7 @@ const orderRouter = express.Router()
 orderRouter.post('/create', orderController.createOrder)
 orderRouter.put('/update-status:id',requireApiKey, authenticationAdmin, orderController.updateOrderStatus)
 orderRouter.get('/getall', requireApiKey, authenticationAdmin, orderController.getAllOrder)
-orderRouter.get('/get/:id',orderController.getOrderByUserId)
+orderRouter.get('/user/getall/:id',orderController.getOrderByUserId)
+orderRouter.get('/get/:id',orderController.getOrderById)
 
 export default orderRouter

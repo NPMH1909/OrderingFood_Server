@@ -1,4 +1,5 @@
 import { ConflictError } from "../errors/conflict.error.js"
+import { NotFoundError } from "../errors/notFound.error.js"
 import menuItemModel from "../models/menuItem.model.js"
 
 const createItem = async (data, image) => {
@@ -62,13 +63,18 @@ const updateItem = async (id, data) => {
 }
 
 const getItem = async(id) => {
-    const item = await menuItemModel.findById(id)
+    const item = await menuItemModel.findById(id).orFail(new NotFoundError('Không tìm thấy sản phẩm'))
+    return item
 }
 
+const deleleItem = async(id) => {
+    return await menuItemModel.findByIdAndDelete(id).orFail(new NotFoundError('Không thể xóa sản phẩm'))
+}
 export const menuItemService = {
     createItem,
     updateItem,
     getMenu,
     getItemByCategory,
     getItem,
+    deleleItem
 }
