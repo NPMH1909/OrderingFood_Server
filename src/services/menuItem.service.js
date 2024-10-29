@@ -12,7 +12,7 @@ const createItem = async (data, image) => {
     return await newItem.save()
 }
 
-const getMenu = async (searchTerm = '', page = 1, limit = 10) => {
+const getMenu = async (searchTerm = '', page = 1, limit = 8) => {
     const skip = (page - 1) * limit;
     const searchCondition = searchTerm
         ? { name: { $regex: searchTerm, $options: 'i' } } 
@@ -30,7 +30,7 @@ const getMenu = async (searchTerm = '', page = 1, limit = 10) => {
     };
 };
 
-const getItemByCategory = async (category, searchTerm = '', page = 1, limit = 10) => {
+const getItemByCategory = async (category, searchTerm = '', page = 1, limit = 8) => {
     const skip = (page - 1) * limit;
     const searchCondition = searchTerm
         ? { name: { $regex: searchTerm, $options: 'i' } } 
@@ -70,11 +70,27 @@ const getItem = async(id) => {
 const deleleItem = async(id) => {
     return await menuItemModel.findByIdAndDelete(id).orFail(new NotFoundError('Không thể xóa sản phẩm'))
 }
+
+const getCategory = async() => {
+    return await menuItemModel.distinct('category')
+}
+
+
+const getTopBestSellingProduct = async()=>{
+    return await menuItemModel.find().sort({soldQuantity: -1}).limit(4)
+}
+
+const getNewProduct = async() => {
+    return await menuItemModel.find().limit(4)
+}
 export const menuItemService = {
     createItem,
     updateItem,
     getMenu,
     getItemByCategory,
     getItem,
-    deleleItem
+    deleleItem,
+    getCategory,
+    getTopBestSellingProduct,
+    getNewProduct
 }

@@ -2,6 +2,7 @@ import { BadRequestError } from "../errors/badRequest.error.js"
 import { ConflictError } from "../errors/conflict.error.js"
 import { createApiKey, verifyToken } from "../middlewares/apiKey.middleware.js"
 import { checkPassword, createHash } from "../middlewares/password.middleware.js"
+import cartModel from "../models/cart.model.js"
 import userModel from "../models/user.model.js"
 import { sendNewPassword, sendVerificationCode } from "./mail.service.js"
 
@@ -32,7 +33,10 @@ const createUser = async (token, verification) => {
         email: email,
         password: await createHash(password)
     })
-    return await newUser.save()
+    await newUser.save()
+    const newCart = new cartModel({user: newUser._id, createdAt: Date.now()})
+    await newCart.save()
+    return newUser
 }
 
 const login = async ({ username, password }) => {
@@ -75,11 +79,15 @@ const forgotPassword = async (email) => {
     return await sendNewPassword(user.email, randomString);
 }
 
+const getUserById = async(id) => {
+    return await userModel.findById(id)
+}
 export const userService = {
     register,
     createUser,
     login,
     changePassword,
     forgotPassword,
-    updateUser
+    updateUser,
+    getUserById,
 }

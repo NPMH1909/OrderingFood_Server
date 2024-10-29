@@ -7,7 +7,6 @@ import { UnAuthorizedError } from "../errors/unauthorizedRequest.error.js"
 import { NotFoundError } from "../errors/notFound.error.js"
 import userModel from "../models/user.model.js"
 
-
 export const createApiKey = (data, exp) => {
   const token = jwt.sign(
     {
@@ -24,7 +23,6 @@ export const verifyToken = (token, verificationCode) => {
   if (!decoded) {
     throw new BadRequestError('Token không hợp lệ hoặc đã hết hạn');
   }
-  console.log('decode', decoded)
   if (decoded.data.verificationCode !== verificationCode) {
     throw new BadRequestError('Mã xác thực không đúng');
   }
@@ -44,7 +42,6 @@ export const requireApiKey = async (req, res, next) => {
 
     jwt.verify(apiKey, 'secret', async (err, decoded) => {
       try {
-        console.log('data', decoded)
         if (err || !decoded) {
           throw new UnAuthorizedError('Bạn cần đăng nhập 2')
         } else {

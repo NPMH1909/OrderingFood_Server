@@ -2,9 +2,20 @@ import { HttpStatusCode } from "axios"
 import { Response } from "../utils/response.js"
 import { orderService } from "../services/order.service.js"
 
+
+
+const createPaymentOrderLink = async (req, res) => {
+    try {
+        const result = await orderService.createPaymentOrderLink(req.user.id, req.body)
+        return new Response(HttpStatusCode.Created, 'Tạo thành công đơn hàng', result).responseHandler(res)
+    } catch (error) {
+        return new Response(error.statusCode || HttpStatusCode.InternalServerError, error.message, null).responseHandler(res)
+    }
+}
+
 const createOrder = async (req, res) => {
     try {
-        const result = await orderService.createOrder(req.body)
+        const result = await orderService.createOrder(req.user.id, req.body)
         return new Response(HttpStatusCode.Created, 'Tạo thành công đơn hàng', result).responseHandler(res)
     } catch (error) {
         return new Response(error.statusCode || HttpStatusCode.InternalServerError, error.message, null).responseHandler(res)
@@ -61,5 +72,6 @@ export const orderController = {
     updateOrderStatus,
     getOrderByUserId,
     getAllOrder,
-    getOrderById
+    getOrderById,
+    createPaymentOrderLink
 }

@@ -9,6 +9,9 @@ menuItemRouter.put('/update/:id', requireApiKey,authenticationAdmin, uploadFiles
 menuItemRouter.get('/getall', menuItemController.getMenu)
 menuItemRouter.get('/getallbycategory', menuItemController.getItemByCategory)
 menuItemRouter.get('/get-item/:id', menuItemController.getItem)
+menuItemRouter.get('/get-category', menuItemController.getCategory)
 menuItemRouter.delete('/delete-item/:id', menuItemController.deleleItem)
+menuItemRouter.get('/best-seller', menuItemController.getTopBestSellingProduct)
+menuItemRouter.get('/new-product', menuItemController.getNewProduct)
 
 export default menuItemRouter

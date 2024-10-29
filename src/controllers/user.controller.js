@@ -63,12 +63,23 @@ const updateUser = async(req, res) => {
         return new Response(error.statusCode || HttpStatusCode.InternalServerError, error.message, null).responseHandler(res);
     }
 }
+const getUserById = async(req, res) => {
+    try {
+        const id = req.user.id
+        const result = await userService.getUserById(id)
+        return new Response(HttpStatusCode.Ok, 'Gửi mật khẩu mới thành công', result).responseHandler(res);
+    } catch (error) {
+        return new Response(error.statusCode || HttpStatusCode.InternalServerError, error.message, null).responseHandler(res);
+    }
+}
+
 export const userController = {
     register,
     createUser,
     login,
     changePassword,
     forgotPassword,
-    updateUser
+    updateUser,
+    getUserById
 }
 

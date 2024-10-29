@@ -9,6 +9,7 @@ const menuItemSchema = new mongoose.Schema({
         url: {type: String, required: true},
         id: {type: String, required: true}
      },
+    soldQuantity: {type: Number, default:0},
     //quantity: { type: Number, required: true },
     isAvailable: { type: Boolean, default: true },
 },
