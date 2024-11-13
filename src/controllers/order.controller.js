@@ -35,22 +35,31 @@ const updateOrderStatus = async (req, res) => {
 
 const getAllOrder = async (req, res) => {
     try {
-        const page = parseInt(req.query.page) || 1
-        const limit = parseInt(req.query.limit) || 10
-        const result = await orderService.getAllOrder(page, limit)
-        return new Response(HttpStatusCode.Ok, 'Lấy danh sách đơn hàng thành công', result).responseHandler(res)
+        // Lấy giá trị page và limit từ query string, mặc định là 1 và 10
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+
+        // Lấy các tham số email và status từ query string (nếu có)
+        const email = req.query.email || '';  // Default là rỗng nếu không có
+        const status = req.query.status || '';  // Default là rỗng nếu không có
+
+        // Gọi service để lấy danh sách đơn hàng với các tham số lọc
+        const result = await orderService.getAllOrder(email, status, page, limit);
+
+        // Trả về kết quả
+        return new Response(HttpStatusCode.Ok, 'Lấy danh sách đơn hàng thành công', result).responseHandler(res);
     } catch (error) {
-        return new Response(error.statusCode || HttpStatusCode.InternalServerError, error.message, null).responseHandler(res)
+        // Xử lý lỗi và trả về response
+        return new Response(error.statusCode || HttpStatusCode.InternalServerError, error.message, null).responseHandler(res);
     }
-}
+};
 
 const getOrderByUserId = async (req, res) => {
     try {
-        const userid = req.user.id
         const page = parseInt(req.query.page) || 1
         const limit = parseInt(req.query.limit) || 10
-        const result = await orderService.getOrderByUserId(userid, page, limit)
-        return new Response(HttpStatusCode.Ok, 'Lấy danh sách đơn hàng thành công', result).responseHandler(res)
+        const result = await orderService.getOrderByUserId(req.user.id, page, limit)
+        return new Response(HttpStatusCode.Ok, 'Lấy danh sách đơn hàng thành công', result.data, result.info).responseHandler(res)
     } catch (error) {
         return new Response(error.statusCode || HttpStatusCode.InternalServerError, error.message, null).responseHandler(res)
     }

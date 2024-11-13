@@ -28,16 +28,32 @@ const updateOrderStatus = async (id, status) => {
     return order
 }
 
-const getAllOrder = async (page = 1, limit = 10) => {
+const getAllOrder = async (email, status, page = 1, limit = 10) => {
     const skip = (page - 1) * limit;
-    const orders = await orderModel.find()
+
+    // Xây dựng query động
+    const query = {};
+
+    // Nếu có email, thêm điều kiện tìm theo email
+    if (email) {
+        query['user.email'] = email;
+    }
+
+    // Nếu có status, thêm điều kiện tìm theo status
+    if (status) {
+        query['status'] = status;
+    }
+
+    // Tìm đơn hàng theo query, đồng thời populate thông tin từ các bảng khác
+    const orders = await orderModel.find(query)
+        .populate('user', 'name email')  // Lấy thông tin name và email từ người dùng
+        .populate('items.menuItem', 'name')  // Lấy tên của món ăn từ MenuItems
         .sort({ createdAt: -1 })
         .skip(skip)
-        .limit(limit)
-    if (orders.length === 0) {
-        throw new NotFoundError('Không tìm thấy đơn hàng .');
-    }
-    const totalOrders = await orderModel.countDocuments();
+        .limit(limit);
+
+    // Tính tổng số đơn hàng
+    const totalOrders = await orderModel.countDocuments(query);
     return {
         orders,
         currentPage: page,
@@ -55,16 +71,15 @@ const getOrderByUserId = async (userId, page = 1, limit = 10) => {
 
     const totalOrders = await orderModel.countDocuments({ user: userId });
 
-    if (orders.length === 0) {
-        throw new NotFoundError('Không tìm thấy đơn hàng.');
-    }
     return {
-        orders,
-        currentPage: page,
-        totalPages: Math.ceil(totalOrders / limit),
-        totalOrders,
+        data: orders, info:{currentPage: page,
+            totalPages: Math.ceil(totalOrders / limit),
+            totalOrders,}
+        
     };
 };
+
+
 
 const getOrder = async (id) => {
     const order = await orderModel.findById(id).orFail(new NotFoundError('Không tìm thấy đơn hàng'))

@@ -54,10 +54,10 @@ const getItemByCategory = async (category, searchTerm = '', page = 1, limit = 8)
 
 const updateItem = async (id, data) => {
     const existedItem = await menuItemModel.findById(id)
-    const {name, } = data
-    if(name === existedItem.name){
+    // const {name, } = data
+    // if(name === existedItem.name){
 
-    }
+    // }
     const item = menuItemModel.findByIdAndUpdate(id, { ...data }, { new: true })
     return await item
 }

@@ -1,5 +1,6 @@
 import { BadRequestError } from "../errors/badRequest.error.js"
 import { ConflictError } from "../errors/conflict.error.js"
+import { UnAuthorizedError } from "../errors/unauthorizedRequest.error.js"
 import { createApiKey, verifyToken } from "../middlewares/apiKey.middleware.js"
 import { checkPassword, createHash } from "../middlewares/password.middleware.js"
 import cartModel from "../models/cart.model.js"
@@ -53,6 +54,24 @@ const login = async ({ username, password }) => {
     return createApiKey({ id: user._id, role: user.role }, exp)
 }
 
+const adminLogin = async ({ username, password }) => {
+    const user = await userModel.findOne({
+        $or: [{ email: username }, { phoneNumber: username }]
+    }).orFail(() => {
+        throw new BadRequestError('Tài khoản hoặc mật khẩu không chính xác')
+    })
+    const isPasswordValid = await checkPassword(password, user.password)
+    if (!isPasswordValid) {
+        throw new BadRequestError('Tài khoản hoặc mật khẩu không chính xác')
+    }
+    if(user.role === 'USER'){
+        throw new UnAuthorizedError('Tài khoản không có quyền truy cập')
+
+    }
+    const exp = parseInt(60 * 60 * 24)
+    return createApiKey({ id: user._id, role: user.role }, exp)
+}
+
 const updateUser = async (id, { phoneNumber, address, name }) => {
     const user = await userModel.findByIdAndUpdate(id, { phoneNumber, address, name }, { new: true })
     return user
@@ -90,4 +109,5 @@ export const userService = {
     forgotPassword,
     updateUser,
     getUserById,
+    adminLogin,
 }
