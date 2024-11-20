@@ -31,47 +31,49 @@ const addItemToCart = async (userId, productId, quantity = 1) => {
 
 const getCart = async (userId) => {
     const cart = await cartModel.aggregate([
-        { 
-            $match: { user: Types.ObjectId.createFromHexString(userId) } 
-        },
-        {
-            $unwind: "$items" 
-        },
-        {
-            $lookup: {
-                from: "menuitems", 
-                localField: "items.item",
-                foreignField: "_id",
-                as: "itemDetails"
-            }
-        },
-        {
-            $unwind: {
-                path: "$itemDetails",
-                preserveNullAndEmptyArrays: true 
-            }
-        },
-        {
-            $addFields: {
-                "items.price": "$itemDetails.price", 
-                "items.imageUrl": "$itemDetails.image.url", 
-                "items.name": "$itemDetails.name" 
-            }
-        },
-        {
-            $group: {
-                _id: "$_id",
-                user: { $first: "$user" },
-                totalAmount: { $first: "$totalAmount" },
-                createdAt: { $first: "$createdAt" },
-                updatedAt: { $first: "$updatedAt" },
-                items: { $push: "$items" } 
-            }
+      { 
+        $match: { user: Types.ObjectId.createFromHexString(userId) } 
+      },
+      {
+        $unwind: "$items"  // Tách từng sản phẩm trong giỏ hàng
+      },
+      {
+        $lookup: {
+          from: "menuitems", 
+          localField: "items.item",
+          foreignField: "_id",
+          as: "itemDetails"
         }
+      },
+      {
+        $unwind: {
+          path: "$itemDetails",
+          preserveNullAndEmptyArrays: true 
+        }
+      },
+      {
+        $addFields: {
+          "items.price": "$itemDetails.price", 
+          "items.imageUrl": "$itemDetails.image.url", 
+          "items.name": "$itemDetails.name"
+        }
+      },
+      {
+        $group: {
+          _id: "$_id",
+          user: { $first: "$user" },
+          totalAmount: { $first: "$totalAmount" },
+          createdAt: { $first: "$createdAt" },
+          updatedAt: { $first: "$updatedAt" },
+          items: { $push: "$items" },
+          totalItems: { $sum: "$items.quantity" } // Tính tổng số lượng sản phẩm
+        }
+      }
     ]);
-
+  
     return cart.length > 0 ? cart[0] : null; 
-};
+  };
+  
 
 export const cartService = {
     removeItemFromCart,
