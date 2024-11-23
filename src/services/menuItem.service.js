@@ -12,12 +12,33 @@ const createItem = async (data, image) => {
     return await newItem.save()
 }
 
+// const getMenu = async (searchTerm = '', page = 1, limit = 8) => {
+//     const skip = (page - 1) * limit;
+//     const searchCondition = searchTerm
+//         ? { name: { $regex: searchTerm, $options: 'i' } } 
+//         : {};
+//     const menuItems = await menuItemModel.find(searchCondition)
+//         .sort({createdAt:-1})
+//         .skip(skip)
+//         .limit(limit)
+//     const totalItems = await menuItemModel.countDocuments(searchCondition);
+//     const totalPages = Math.ceil(totalItems / limit);
+//     return {
+//         menuItems,
+//         currentPage: page,
+//         totalPages,
+//         totalItems,
+//     };
+// };
+
 const getMenu = async (searchTerm = '', page = 1, limit = 8) => {
     const skip = (page - 1) * limit;
-    const searchCondition = searchTerm
-        ? { name: { $regex: searchTerm, $options: 'i' } } 
-        : {};
+    const searchCondition = {
+        isAvailable: true, 
+        ...(searchTerm && { name: { $regex: searchTerm, $options: 'i' } }), // Nếu có searchTerm thì thêm điều kiện
+    };
     const menuItems = await menuItemModel.find(searchCondition)
+        .sort({createdAt:-1})
         .skip(skip)
         .limit(limit)
     const totalItems = await menuItemModel.countDocuments(searchCondition);
@@ -32,12 +53,13 @@ const getMenu = async (searchTerm = '', page = 1, limit = 8) => {
 
 const getItemByCategory = async (category, searchTerm = '', page = 1, limit = 8) => {
     const skip = (page - 1) * limit;
-    const searchCondition = searchTerm
-        ? { name: { $regex: searchTerm, $options: 'i' } } 
-        : {};
+    const searchCondition = {
+        isAvailable: true, 
+        ...(searchTerm && { name: { $regex: searchTerm, $options: 'i' } }), // Nếu có searchTerm thì thêm điều kiện
+    };
     const query = {
         category,
-        ...searchCondition,
+        ...searchCondition, 
     };
     const menuItems = await menuItemModel.find(query)
         .skip(skip)
@@ -81,7 +103,7 @@ const getTopBestSellingProduct = async()=>{
 }
 
 const getNewProduct = async() => {
-    return await menuItemModel.find().limit(4)
+    return await menuItemModel.find().sort({createdAt:-1}).limit(4)
 }
 export const menuItemService = {
     createItem,

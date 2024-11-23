@@ -10,6 +10,31 @@ const createPaymentOrderLink = async (userid, data) => {
     const paymentLinkRes = await payOrder({ orderCode, total: totalAmount })
     return paymentLinkRes
 }
+// const createPaymentOrderLink = async (userid, data) => {
+//   const { totalAmount, orderCode, items } = data;
+
+//   // Kiểm tra tình trạng của các sản phẩm trong đơn hàng
+//   for (const item of items) {
+//       const menuItem = await menuItemModel.findById(item.menuItem);  // Lấy thông tin sản phẩm từ cơ sở dữ liệu
+
+//       // Kiểm tra nếu sản phẩm không còn hàng hoặc không khả dụng
+//       if (!menuItem || !menuItem.isAvailable) {
+//           return { 
+//               success: false,
+//               message: `Sản phẩm ${menuItem.name} không còn hàng hoặc không khả dụng`
+//           };
+//       }
+//   }
+
+  // Tạo đơn hàng mới nếu tất cả sản phẩm còn hàng
+//   const newOrder = new orderModel({ ...data, user: userid });
+
+//   // Gọi API tạo liên kết thanh toán
+//   const paymentLinkRes = await payOrder({ orderCode, total: totalAmount });
+
+//   // Nếu thanh toán thành công, trả về liên kết thanh toán
+//   return paymentLinkRes;
+// }
 
 // const createOrder = async (userid, data) => {
 //     const {orderCode} = data
@@ -45,40 +70,84 @@ const updateOrderStatus = async (id, status) => {
     return order
 }
 
-const getAllOrder = async (email, status, page = 1, limit = 10) => {
-    const skip = (page - 1) * limit;
-    const query = {};
-    if (email) {
-        const user = await userModel.findOne({ email });
-        if (!user) {
-            return {
-                orders: [],
-                currentPage: page,
-                totalPages: 0,
-                totalOrders: 0,
-            };
-        }
-        query['user'] = user._id;
-    }
-    if (status) {
-        query['status'] = status;
-    }
-    const orders = await orderModel.find(query)
-        .populate('user', 'name email')  
-        .populate('items.menuItem', 'name price') 
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(limit);
+// const getAllOrder = async (email, status, page = 1, limit = 10) => {
+//     const skip = (page - 1) * limit;
+//     const query = {};
+//     if (email) {
+//         const user = await userModel.findOne({ email });
+//         if (!user) {
+//             return {
+//                 orders: [],
+//                 currentPage: page,
+//                 totalPages: 0,
+//                 totalOrders: 0,
+//             };
+//         }
+//         query['user'] = user._id;
+//     }
+//     if (status) {
+//         query['status'] = status;
+//     }
+//     const orders = await orderModel.find(query)
+//         .populate('user', 'name email')  
+//         .populate('items.menuItem', 'name price') 
+//         .sort({ createdAt: -1 })
+//         .skip(skip)
+//         .limit(limit);
 
-    const totalOrders = await orderModel.countDocuments(query);
-    return {
-        orders,
-        currentPage: page,
-        totalPages: Math.ceil(totalOrders / limit),
-        totalOrders,
-    };
+//     const totalOrders = await orderModel.countDocuments(query);
+//     return {
+//         orders,
+//         currentPage: page,
+//         totalPages: Math.ceil(totalOrders / limit),
+//         totalOrders,
+//     };
+// };
+
+const getAllOrder = async (email, status, page = 1, limit = 10, date) => {
+  const skip = (page - 1) * limit;
+  const query = {};
+
+  if (email) {
+      const user = await userModel.findOne({ email });
+      if (!user) {
+          return {
+              orders: [],
+              currentPage: page,
+              totalPages: 0,
+              totalOrders: 0,
+          };
+      }
+      query['user'] = user._id;
+  }
+
+  if (status) {
+      query['status'] = status;
+  }
+
+  if (date) {
+    const startOfDay = new Date(new Date(date).setHours(0, 0, 0, 0)).toISOString();
+    const endOfDay = new Date(new Date(date).setHours(23, 59, 59, 999)).toISOString();
+
+    query['createdAt'] = { $gte: new Date(startOfDay), $lte: new Date(endOfDay) };
+  }
+
+  const orders = await orderModel.find(query)
+      .populate('user', 'name email')  
+      .populate('items.menuItem', 'name price') 
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+  const totalOrders = await orderModel.countDocuments(query);
+
+  return {
+      orders,
+      currentPage: page,
+      totalPages: Math.ceil(totalOrders / limit),
+      totalOrders,
+  };
 };
-
 
 const getOrderByUserId = async (userId, page = 1, limit = 10) => {
   const skip = (page - 1) * limit;

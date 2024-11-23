@@ -74,7 +74,7 @@ const getItem = async(req, res) => {
     try{
         const {id} = req.params
         const updatedItem = await menuItemService.getItem(id);
-        return new Response(HttpStatusCode.Ok, 'Cập nhật thành công', updatedItem).responseHandler(res);
+        return new Response(HttpStatusCode.Ok, 'Lấy item thành công', updatedItem).responseHandler(res);
     } catch (error) {
         return new Response(error.statusCode || HttpStatusCode.InternalServerError, error.message, null).responseHandler(res);
     }
@@ -83,7 +83,7 @@ const deleleItem = async(req, res) => {
     try{
         const {id} = req.params
         const updatedItem = await menuItemService.deleleItem(id);
-        return new Response(HttpStatusCode.Ok, 'Cập nhật thành công', updatedItem).responseHandler(res);
+        return new Response(HttpStatusCode.Ok, 'xóa thành công', updatedItem).responseHandler(res);
     } catch (error) {
         return new Response(error.statusCode || HttpStatusCode.InternalServerError, error.message, null).responseHandler(res);
     }
@@ -92,7 +92,7 @@ const deleleItem = async(req, res) => {
 const getTopBestSellingProduct = async(req, res) => {
     try {
         const result = await menuItemService.getTopBestSellingProduct();
-        return new Response(HttpStatusCode.Ok, 'Cập nhật thành công', result).responseHandler(res);
+        return new Response(HttpStatusCode.Ok, 'lấy items thành công', result).responseHandler(res);
     } catch (error) {
         return new Response(error.statusCode || HttpStatusCode.InternalServerError, error.message, null).responseHandler(res);
     }
@@ -101,7 +101,7 @@ const getTopBestSellingProduct = async(req, res) => {
 const getNewProduct = async(req, res) => {
     try {
         const result = await menuItemService.getNewProduct();
-        return new Response(HttpStatusCode.Ok, 'Cập nhật thành công', result).responseHandler(res);
+        return new Response(HttpStatusCode.Ok, 'Lấy items thành công', result).responseHandler(res);
     } catch (error) {
         return new Response(error.statusCode || HttpStatusCode.InternalServerError, error.message, null).responseHandler(res);
     }

@@ -1,5 +1,7 @@
 import mongoose, { Types } from "mongoose";
 import cartModel from "../models/cart.model.js";
+import menuItemModel from "../models/menuItem.model.js";
+import { NotFoundError } from "../errors/notFound.error.js";
 
 const removeItemFromCart = async (userId, itemId) => {
     const cart = await cartModel.findOne({ user: userId });
@@ -16,14 +18,20 @@ const removeItemFromCart = async (userId, itemId) => {
 
 
 const addItemToCart = async (userId, productId, quantity = 1) => {
+    const product = await menuItemModel.findById(productId).orFail(new NotFoundError('Không tìm thấy sản phẩm'))
+
     const cart = await cartModel.findOne({ user: userId });
     if (!cart) throw new Error("Cart not found");
 
     const existingItemIndex = cart.items.findIndex((item) => item.item.equals(productId));
-    if (existingItemIndex >= 0) {
+    if(!product.isAvailable){
+      console.log('sản phẩm tạm đã hết')
+    }else{
+      if (existingItemIndex >= 0) {
         cart.items[existingItemIndex].quantity += quantity;
     } else {
         cart.items.push({ item: productId, quantity });
+    }
     }
 
     return await cart.save();

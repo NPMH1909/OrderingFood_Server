@@ -35,9 +35,10 @@ const getAllOrder = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
+        const date = req.query.date || ''; 
         const email = req.query.email || '';  
         const status = req.query.status || '';  
-        const result = await orderService.getAllOrder(email, status, page, limit);
+        const result = await orderService.getAllOrder(email, status, page, limit, date);
         return new Response(HttpStatusCode.Ok, 'Lấy danh sách đơn hàng thành công', result).responseHandler(res);
     } catch (error) {
         return new Response(error.statusCode || HttpStatusCode.InternalServerError, error.message, null).responseHandler(res);
