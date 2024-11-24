@@ -6,6 +6,14 @@ const orderSchema = new mongoose.Schema({
         ref: 'Users',
         required: true,
     },
+    name:{
+        type: String,
+        required: true,
+    },
+    phone:{
+        type: String,
+        required: true,
+    },
     items: [
         {
             menuItem: {
