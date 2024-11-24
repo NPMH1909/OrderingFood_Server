@@ -10,6 +10,16 @@ const createPaymentOrderLink = async (req, res) => {
         return new Response(error.statusCode || HttpStatusCode.InternalServerError, error.message, null).responseHandler(res)
     }
 }
+const handlePaymentCallback = async (req, res) => {
+    try {
+        const { orderCode } = req.body;  
+        console.log('req', req.body)
+        const result = await orderService.handlePaymentCallback(orderCode)
+        return new Response(HttpStatusCode.Created, 'Tạo thành công đơn hàng', result).responseHandler(res)
+    } catch (error) {
+        return new Response(error.statusCode || HttpStatusCode.InternalServerError, error.message, null).responseHandler(res)
+    }
+}
 
 const createOrder = async (req, res) => {
     try {
@@ -70,9 +80,9 @@ const getDailyRevenue = async (req, res) => {
   
     try {
       const revenue = await orderService.getRevenueForDay(date);
-      res.status(200).json(revenue);
+      return new Response(HttpStatusCode.Ok, 'Lấy danh sách đơn hàng thành công', revenue).responseHandler(res)
     } catch (error) {
-      res.status(500).json({ message: error.message });
+        return new Response(error.statusCode || HttpStatusCode.InternalServerError, error.message, null).responseHandler(res)
     }
   };
   
@@ -111,6 +121,7 @@ const getMonthlyRevenue = async (req, res) => {
 
 export const orderController = {
     createOrder,
+    handlePaymentCallback,
     updateOrderStatus,
     getOrderByUserId,
     getAllOrder,

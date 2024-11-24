@@ -26,18 +26,26 @@ const orderSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['Pending', 'Processing', 'Completed', 'Cancelled'],
+        enum: ['Pending', 'Delivery', 'Success', 'Cancelled'],
         default: 'Pending',
     },
     paymentMethod: {
         type: String,
-        enum: ['Cash', 'Credit Card', 'Online'],
+        enum: ['Cash', 'Online'],
         required: true,
     },
     deliveryAddress: {
         type: String,
         required: true,
     },
+    isPayment: {
+        type: String,
+        enum: ['PAID', 'UNPAID', 'FAILED'],
+        default: 'UNPAID' 
+    },
+    orderCode:{
+        type: String,
+    }
 }, { timestamps: true });
 
 const orderModel = mongoose.model('Orders', orderSchema)
