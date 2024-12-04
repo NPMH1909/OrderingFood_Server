@@ -63,7 +63,8 @@ const getCart = async (userId) => {
         $addFields: {
           "items.price": "$itemDetails.price", 
           "items.imageUrl": "$itemDetails.image.url", 
-          "items.name": "$itemDetails.name"
+          "items.name": "$itemDetails.name",
+          "items.isAvailable": "$itemDetails.isAvailable"
         }
       },
       {

@@ -29,6 +29,19 @@ const getMenu = async (req, res) => {
     }
 };
 
+const getMenuForAdmin = async (req, res) => {
+    try {
+        const searchTerm = req.query.searchTerm
+        const page = parseInt(req.query.page) || 1
+        const limit = parseInt(req.query.limit) || 8
+        const result = await menuItemService.getMenuForAdmin(searchTerm, page, limit)
+        return new Response(HttpStatusCode.Created, 'Lấy menu thành công', result).responseHandler(res);
+    } catch (error) {
+        return new Response(error.statusCode || HttpStatusCode.InternalServerError, error.message, null).responseHandler(res);
+    }
+};
+
+
 const getCategory = async(req, res) => {
     try {
         const result = await menuItemService.getCategory()
@@ -49,7 +62,18 @@ const getItemByCategory = async(req, res) => {
         return new Response(error.statusCode || HttpStatusCode.InternalServerError, error.message, null).responseHandler(res);
     }
 }
+const getItemByCategoryForAdmin = async(req, res) => {
+    try {
+        const {category, searchTerm} = req.query
+        const page = parseInt(req.query.page) || 1
+        const limit = parseInt(req.query.limit) || 8
+        const result = await menuItemService.getItemByCategoryForAdmin(category, searchTerm, page, limit)
+        return new Response(HttpStatusCode.Created, 'Lấy danh sách sản phẩm thành công', result).responseHandler(res);
 
+    } catch (error) {
+        return new Response(error.statusCode || HttpStatusCode.InternalServerError, error.message, null).responseHandler(res);
+    }
+}
 const updateItem = async (req, res) => {
     try {
         const { id } = req.params;
@@ -115,5 +139,7 @@ export const menuItemController = {
     deleleItem,
     getCategory,
     getTopBestSellingProduct,
-    getNewProduct
+    getNewProduct,
+    getMenuForAdmin,
+    getItemByCategoryForAdmin
 };

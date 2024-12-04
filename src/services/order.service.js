@@ -376,17 +376,18 @@ const getRevenueForMonth = async (month, year) => {
     const orders = await orderModel.aggregate([
       {
         $match: {
-          createdAt: { $gte: monthStart, $lte: monthEnd }
+          createdAt: { $gte: monthStart, $lte: monthEnd },
+          status: "Success" // Thêm điều kiện lọc theo status
         }
       },
       {
         $group: {
-          _id: { $dayOfMonth: "$createdAt" },
-          totalRevenue: { $sum: "$totalAmount" }
+          _id: { $dayOfMonth: "$createdAt" }, // Nhóm theo ngày trong tháng
+          totalRevenue: { $sum: "$totalAmount" } // Tổng doanh thu
         }
       },
       {
-        $sort: { _id: 1 }
+        $sort: { _id: 1 } // Sắp xếp theo ngày tăng dần
       }
     ]);
 
@@ -396,25 +397,27 @@ const getRevenueForMonth = async (month, year) => {
   }
 };
 
+
 const getRevenueForYear = async (year) => {
   try {
     const orders = await orderModel.aggregate([
       {
         $match: {
           createdAt: {
-            $gte: new Date(`${year}-01-01`), // Lọc theo đầu năm
-            $lt: new Date(`${parseInt(year) + 1}-01-01`) // Lọc theo đầu năm sau
-          }
+            $gte: new Date(`${year}-01-01`), // Lọc từ đầu năm
+            $lt: new Date(`${parseInt(year) + 1}-01-01`) // Lọc đến đầu năm sau
+          },
+          status: "Success" // Thêm điều kiện lọc theo status
         }
       },
       {
         $group: {
           _id: { $month: "$createdAt" }, // Nhóm theo tháng
-          totalRevenue: { $sum: "$totalAmount" }
+          totalRevenue: { $sum: "$totalAmount" } // Tổng doanh thu
         }
       },
       {
-        $sort: { _id: 1 } // Sắp xếp theo tháng
+        $sort: { _id: 1 } // Sắp xếp theo tháng tăng dần
       }
     ]);
     return orders;
@@ -422,6 +425,7 @@ const getRevenueForYear = async (year) => {
     throw new Error('Error fetching yearly revenue');
   }
 };
+
 
 export const orderService = {
   createOrder,

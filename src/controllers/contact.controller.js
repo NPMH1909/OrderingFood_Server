@@ -25,10 +25,13 @@ export const createContactController = async (req, res) => {
 // Controller lấy tất cả liên hệ
 export const getAllContactsController = async (req, res) => {
   try {
-    const contacts = await getAllContacts();
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const dateFilter = req.query.date || '';
+    const data = await getAllContacts(page, limit, dateFilter);
     res.status(200).json({
       message: 'Danh sách liên hệ',
-      contacts,
+      data,
     });
   } catch (error) {
     console.error(error);
