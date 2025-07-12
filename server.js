@@ -48,8 +48,6 @@ route(app)
 const connect = async () => {
     try {
         await mongoose.connect(DB_URI, {
-            sslValidate: true,
-            sslCA: ca,
             useNewUrlParser: true,
             useUnifiedTopology: true,
         })

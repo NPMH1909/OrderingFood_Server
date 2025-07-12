@@ -1,4 +1,5 @@
 import cartRouter from "./cart.route.js"
+import CheckRouter from "./check.route.js"
 import contactRouter from "./contact.route.js"
 import menuItemRouter from "./menuItem.route.js"
 import orderRouter from "./order.route.js"
@@ -12,6 +13,7 @@ const route = (app) => {
     app.use('/payment', paymentRouter)
     app.use('/carts', cartRouter)
     app.use('/contact',contactRouter)
+    app.use('/healthy', CheckRouter)
 }
 
 export default route
