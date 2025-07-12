@@ -36,7 +36,7 @@ const app = express()
 const port = process.env.PORT
 
 // Construct Mongo URI
-const DB_URI = `mongodb://${process.env.DB_USER}:${process.env.DB_PASS}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}?tls=true&retryWrites=false`
+const DB_URI = process.env.MONGODB_URI
 
 // Load CA certificate
 const ca = [fs.readFileSync('./global-bundle.pem')] // 🔁 sửa path nếu để trong /certs
