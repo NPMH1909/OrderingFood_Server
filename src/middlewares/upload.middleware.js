@@ -1,26 +1,33 @@
+// middlewares/uploadFiles.js
 import multer from 'multer';
-import { CloudinaryStorage } from 'multer-storage-cloudinary';
-import cloudinary from '../configs/cloundinary.config.js';
+import multerS3 from 'multer-s3';
+import s3 from '../configs/s3.config.js';
 
-const storage = new CloudinaryStorage({
-  cloudinary,
-  params: {
-    folder: 'orderingfood',
-    allowedFormats: ['jpg', 'png', 'jpeg'], 
-  },
+const upload = multer({
+  storage: multerS3({
+    s3: s3,
+    bucket: 'orderingfood-images', 
+    contentType: multerS3.AUTO_CONTENT_TYPE,
+    metadata: (req, file, cb) => {
+      cb(null, { fieldName: file.fieldname });
+    },
+    key: (req, file, cb) => {
+      const fileName = `${Date.now()}-${file.originalname}`;
+      cb(null, fileName);
+    },
+  }),
 });
-
-const upload = multer({ storage });
 
 const uploadFiles = (req, res, next) => {
   upload.single('image')(req, res, (err) => {
     if (err) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Lỗi trong quá trình upload hình ảnh.', 
+      return res.status(400).json({
+        success: false,
+        message: 'Lỗi trong quá trình upload hình ảnh.',
+        error: err.message,
       });
     }
-    next(); 
+    next();
   });
 };
 

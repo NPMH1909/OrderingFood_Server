@@ -1,64 +1,42 @@
-import { MAIL_CONFIG } from "../configs/mail.config.js";
-import nodemailer from "nodemailer";
-
-const transporter = nodemailer.createTransport({
-    port: 465,
-    host: MAIL_CONFIG.SMTP_HOST,
-    auth: {
-        user: MAIL_CONFIG.GOOGLE_GMAIL,
-        pass: MAIL_CONFIG.GOOGLE_KEY,
-    },
-    secure: true,
-});
+// utils/sendMail.js
+import { transporter, MAIL_CONFIG } from '../configs/mail.config.js';
 
 const sendMail = async ({ to, subject, html }) => {
   const mailData = {
-      from: MAIL_CONFIG.GOOGLE_GMAIL, 
-      to,
+    from: MAIL_CONFIG.FROM_EMAIL,
+    to,
+    subject,
+    html,
+  };
+
+  try {
+    const info = await transporter.sendMail(mailData);
+    console.log('📧 Email sent:', info.messageId);
+    return {
+      from: info.envelope.from,
+      to: info.envelope.to,
       subject,
       html,
-  };
-  await transporter.sendMail(mailData);
-//   try {
-//       const info = await transporter.sendMail(mailData);
-//       const result = {
-//           from: info.envelope.from,
-//           to: info.envelope.to,   
-//           subject: subject,
-//           html: html,
-//       };
-//       return result; 
-//   } catch (err) {
-//       throw err; 
-//   }
+    };
+  } catch (error) {
+    console.error('❌ Error sending email:', error);
+    throw error;
+  }
 };
 
 const sendVerificationCode = async (to, verificationCode) => {
-    console.log('code',verificationCode)
-    const subject = 'Verification Code';
-    const html = `
-        <p>Your verification code is: <strong>${verificationCode}</strong></p>
-        <p><em>Note: This code will expire in 1 minute.</em></p>
-    `;
-    await sendMail({ to, subject, html })
-    // try {
-    //     const result = await sendMail({ to, subject, html })
-    //     return true
-    // } catch (error) {
-    //     return false
-    // }
+  const subject = 'Verification Code';
+  const html = `
+    <p>Your verification code is: <strong>${verificationCode}</strong></p>
+    <p><em>Note: This code will expire in 1 minute.</em></p>
+  `;
+  return await sendMail({ to, subject, html });
 };
 
 const sendNewPassword = async (to, newPassword) => {
-    const subject = 'Forgot Password';
-    const html = `<p>Your new password is: <strong>${newPassword}</strong></p>`;
-    const result = await sendMail({ to, subject, html }); 
-    // try {
-    //     const result = await sendMail({ to, subject, html }); 
-    //     return result
-    //   } catch (error) {
-    //     throw error
-    //   }
+  const subject = 'Forgot Password';
+  const html = `<p>Your new password is: <strong>${newPassword}</strong></p>`;
+  return await sendMail({ to, subject, html });
 };
 
-export { sendMail, sendVerificationCode, sendNewPassword }
+export { sendMail, sendVerificationCode, sendNewPassword };

@@ -5,8 +5,8 @@ import { menuItemService } from "../services/menuItem.service.js";
 const createItem = async (req, res) => {
     try {
         const image = {
-            url: req.file.path, 
-            id: req.file.filename
+            url: req.file.location, 
+            id: req.file.key 
         };
        
         const result = await menuItemService.createItem(req.body, image);
